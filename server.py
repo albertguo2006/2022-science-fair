@@ -19,15 +19,15 @@ server = Server(KEY, PORT)
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-GPIO.setup(13, GPIO.OUT)
-GPIO.setup(21, GPIO.OUT)
+GPIO.setup(23, GPIO.OUT)
+GPIO.setup(4, GPIO.OUT)
 
 while True:
     msg = server.receive(BLANK_INSTRUCTION, BLANK_SP)
 
     if msg == 0:
-        GPIO.output(13, GPIO.LOW)
-        GPIO.output(21, GPIO.LOW)
+        GPIO.output(23, GPIO.LOW)
+        GPIO.output(4, GPIO.LOW)
 
         print("Connection termimated by client")
         break
@@ -35,11 +35,11 @@ while True:
     msg = bytes.fromhex(msg[64:112]).decode('utf-8')
 
     if msg[0] == 'g':
-        GPIO.output(13, GPIO.HIGH)
+        GPIO.output(23, GPIO.HIGH)
     else:
-        GPIO.output(13, GPIO.LOW)
+        GPIO.output(23, GPIO.LOW)
 
     if msg[1] == 'r':
-        GPIO.output(21, GPIO.HIGH)
+        GPIO.output(4, GPIO.HIGH)
     else:
-        GPIO.output(21, GPIO.LOW)
+        GPIO.output(4, GPIO.LOW)
