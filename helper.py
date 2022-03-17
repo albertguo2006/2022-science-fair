@@ -275,11 +275,11 @@ class Server:
         msg = msg.ljust(48, '0')
 
         iteration = str(hex(self.hasher.iteration)).lstrip('0x')
-        iteration = iteration.rjust(10, '0')
+        iteration = iteration.rjust(6, '0')
 
         time = round(t.time() * 10) % (2 ** 16)
         time = str(hex(time)).lstrip('0x')
-        time = time.rjust(4, '0')
+        time = time.rjust(8, '0')
 
         return (msg + special + time + iteration)
 
