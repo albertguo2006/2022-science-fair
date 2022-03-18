@@ -201,16 +201,16 @@ class Client:
         return data
 
     def msgConstructor(self, msg, special):
-        msg = msg.ljust(48, '0')
+        msg = msg.ljust(176, '0')
 
         iteration = str(hex(self.hasher.iteration)).lstrip('0x')
-        iteration = iteration.rjust(10, '0')
+        iteration = iteration.rjust(8, '0')
 
-        time = round(t.time() * 10) % (2 ** 16)
+        time = round(t.time() * 10) % (2 ** 24)
         time = str(hex(time)).lstrip('0x')
-        time = time.rjust(4, '0')
+        time = time.rjust(6, '0')
 
-        return (msg + special + time + iteration)
+        return (special + time + iteration + msg)
 
     def close(self):
         self.s.close()
@@ -227,7 +227,7 @@ class Server:
 
         self.conn, self.addr = self.s.accept()
 
-        data = self.conn.recv(512)
+        data = self.conn.recv(1024)
 
         keyHash = hashlib.sha512(bytes.fromhex(self.key))
         keyHash = keyHash.digest()
@@ -247,7 +247,7 @@ class Server:
     def receive(self, msg, special):
         hash = self.hasher.updateHash(1)
 
-        data = self.conn.recv(512)
+        data = self.conn.recv(1024)
 
         if not data:
             self.close()
@@ -264,6 +264,8 @@ class Server:
 
         msg = self.msgConstructor(msg, special)
 
+        print(msg)
+
         msg = hash + msg
         msg = msgEncrypter(msg, hash)
 
@@ -272,16 +274,16 @@ class Server:
         return data
 
     def msgConstructor(self, msg, special):
-        msg = msg.ljust(48, '0')
+        msg = msg.ljust(176, '0')
 
         iteration = str(hex(self.hasher.iteration)).lstrip('0x')
-        iteration = iteration.rjust(6, '0')
+        iteration = iteration.rjust(8, '0')
 
-        time = round(t.time() * 10) % (2 ** 16)
+        time = round(t.time() * 10) % (2 ** 24)
         time = str(hex(time)).lstrip('0x')
-        time = time.rjust(8, '0')
+        time = time.rjust(6, '0')
 
-        return (msg + special + time + iteration)
+        return (special + time + iteration + msg)
 
     def close(self):
         self.s.close()
@@ -352,74 +354,26 @@ def msgEncrypter(msg, key):
     key = bytes.fromhex(key)
     msg = bytes.fromhex(msg)
 
-    cipher = AES.new(key, AES.MODE_ECB)
+    iv = hashlib.md5(key)
+    iv = iv.digest()
 
-    msg = cipher.encrypt(msg)
-    msg = scrambler(bytearray(msg), bytearray(key))
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
     msg = cipher.encrypt(msg)
 
     return msg
 
-
-# Decypts messages mades using msgEncrypter
 def msgDecrypter(msg, key):
     key = bytes.fromhex(key)
 
-    cipher = AES.new(key, AES.MODE_ECB)
+    iv = hashlib.md5(key)
+    iv = iv.digest()
 
-    msg = cipher.decrypt(msg)
-    msg = descrambler(bytearray(msg), bytearray(key))
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+
     msg = cipher.decrypt(msg)
 
     return msg.hex()
-
-
-# Scrambles and changes messages using a key
-def scrambler(msg, key):
-    key = hashlib.sha512(key)
-    key = key.digest()
-
-    if len(msg) != len(key):
-        print(f"Key is of length {len(key)}, but msg is of length {len(msg)}")
-        raise ValueError
-
-    # Mutater
-    for i in range(len(msg)):
-        msg[i] = byteBinAdd(msg[i], key[i])
-
-    # Scrambler
-    for i in range(len(msg)):
-        keyIndex = key[i] % 64
-
-        temp = msg[i]
-        msg[i] = msg[keyIndex]
-        msg[keyIndex] = temp
-
-    return msg
-
-
-# Reverses scrambler
-def descrambler(msg, key):
-    key = hashlib.sha512(key)
-    key = key.digest()
-
-    if len(msg) != len(key):
-        print(f"Key is of length {len(key)}, but msg is of length {len(msg)}")
-        raise ValueError
-
-    # Scrambler
-    for i in range(len(msg)):
-        keyIndex = key[63 - i] % 64
-
-        temp = msg[63 - i]
-        msg[63 - i] = msg[keyIndex]
-        msg[keyIndex] = temp
-
-    # Mutater
-    for i in range(len(msg)):
-        msg[i] = byteBinAdd(msg[i], key[i])
-
-    return msg
 
 
 # Gets the next hash from a hash value and a key

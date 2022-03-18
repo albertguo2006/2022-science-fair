@@ -3,7 +3,7 @@ import hashlib
 import RPi.GPIO as GPIO
 from helper import *
 
-BLANK_INSTRUCTION = "0" * 48
+BLANK_INSTRUCTION = "0" * 176
 BLANK_SP = "00"
 START_SP = "01"
 END_SP = "01"
@@ -32,7 +32,7 @@ while True:
         print("Connection termimated by client")
         break
 
-    msg = bytes.fromhex(msg[64:112]).decode('utf-8')
+    msg = bytes.fromhex(msg[80:256]).decode('utf-8')
 
     if msg[0] == 'g':
         GPIO.output(23, GPIO.HIGH)

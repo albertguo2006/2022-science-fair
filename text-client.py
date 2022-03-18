@@ -2,7 +2,7 @@ import secrets
 import hashlib
 from helper import *
 
-BLANK_INSTRUCTION = "0" * 48
+BLANK_INSTRUCTION = "0" * 176
 BLANK_SP = "00"
 START_SP = "01"
 END_SP = "01"
@@ -21,12 +21,12 @@ while True:
     while True:
         msg = input("Input a message: ")
 
-        if len(msg) <= 24:
+        if len(msg) <= 88:
             break
         else:
             print("Message too long!")
 
-    msg = msg.ljust(24, '\0')
+    msg = msg.ljust(88, '\0')
     msg = msg.encode("utf-8").hex()
 
     msg = client.send(msg, BLANK_SP)

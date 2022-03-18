@@ -14,12 +14,10 @@ KEY = input("Input a key: ")
 KEY = hashlib.sha256(KEY.encode("utf-8"))
 KEY = KEY.hexdigest()
 
-server = Server(KEY, PORT)
-
 while True:
-    msg = server.receive(BLANK_INSTRUCTION, BLANK_SP)
+    server = Server(KEY, PORT)
 
-    if msg == 0:
-        break
+    msg = BLANK_INSTRUCTION
 
-    print(f"Message recived: {bytes.fromhex(msg[80:256]).decode('utf-8')}")
+    while True:
+        msg = server.receive(BLANK_INSTRUCTION, BLANK_SP)
