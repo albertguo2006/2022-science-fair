@@ -15,31 +15,34 @@ KEY = input("Input a key: ")
 KEY = hashlib.sha256(KEY.encode("utf-8"))
 KEY = KEY.hexdigest()
 
-server = Server(KEY, PORT)
-
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 GPIO.setup(23, GPIO.OUT)
 GPIO.setup(4, GPIO.OUT)
 
 while True:
-    msg = server.receive(BLANK_INSTRUCTION, BLANK_SP)
+    server = Server(KEY, PORT)
 
-    if msg == 0:
-        GPIO.output(23, GPIO.LOW)
-        GPIO.output(4, GPIO.LOW)
+    while True:
+        msg = server.receive(BLANK_INSTRUCTION, BLANK_SP)
 
-        print("Connection termimated by client")
-        break
+        if msg == 0:
+            GPIO.output(23, GPIO.LOW)
+            GPIO.output(4, GPIO.LOW)
 
-    msg = bytes.fromhex(msg[80:256]).decode('utf-8')
+            server.close()
+            print("Connection termimated by client")
 
-    if msg[0] == 'g':
-        GPIO.output(23, GPIO.HIGH)
-    else:
-        GPIO.output(23, GPIO.LOW)
+            break
 
-    if msg[1] == 'r':
-        GPIO.output(4, GPIO.HIGH)
-    else:
-        GPIO.output(4, GPIO.LOW)
+        msg = bytes.fromhex(msg[80:256]).decode('utf-8')
+
+        if msg[0] == 'g':
+            GPIO.output(23, GPIO.HIGH)
+        else:
+            GPIO.output(23, GPIO.LOW)
+
+        if msg[1] == 'r':
+            GPIO.output(4, GPIO.HIGH)
+        else:
+            GPIO.output(4, GPIO.LOW)

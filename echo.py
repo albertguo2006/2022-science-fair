@@ -21,3 +21,9 @@ while True:
 
     while True:
         msg = server.receive(BLANK_INSTRUCTION, BLANK_SP)
+
+        if msg == 0:
+            server.close()
+            print("Connection termimated by client")
+
+            break
