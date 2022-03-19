@@ -13,7 +13,8 @@ END_SP = "01"
 RESENT_SP = "02"
 
 PORT = 2000
-SERVER_IP = "192.168.1.64"
+SERVER_IP = "127.0.0.1"
+# SERVER_IP = "192.168.1.64"
 
 GRAY = (128, 128, 128)
 BLACK = (0, 0, 0)
@@ -31,6 +32,11 @@ pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SCREEN_SIZE)
 screen.fill(BLACK)
+
+ROLLING_TIMER_LENGTH = 256
+TIMELIST = [0.01] * ROLLING_TIMER_LENGTH
+
+counter = 0
 
 running = True
 
@@ -67,6 +73,7 @@ while running:
         clock.tick(TICK_TIME)
 
     run_time = time.time() - start_time
+    TIMELIST[counter % ROLLING_TIMER_LENGTH] = run_time
+    counter += 1
 
-    if run_time != 0:
-        print(f"TRANSFER SPEED: {704 / run_time}")
+    print(f"TRANSFER SPEED: {704 * ROLLING_TIMER_LENGTH / sum(TIMELIST)}")

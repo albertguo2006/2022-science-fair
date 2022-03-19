@@ -35,7 +35,7 @@ while True:
 
             break
 
-        msg = bytes.fromhex(msg[80:256]).decode('utf-8')
+        msg = bytes.fromhex(msg[0:167]).decode('utf-8')
 
         if msg[0] == 'g':
             GPIO.output(23, GPIO.HIGH)

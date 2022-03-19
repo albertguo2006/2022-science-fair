@@ -180,8 +180,6 @@ class Client:
         hash = self.hasher.updateHash(1)
 
         msg = self.msgConstructor(msg, special)
-
-        msg = hash + msg
         msg = msgEncrypter(msg, hash)
 
         self.s.sendall(msg)
@@ -195,7 +193,7 @@ class Client:
         data = msgDecrypter(data, hash)
         print(data)
 
-        if data[:64] != hash:
+        if data[192:256] != hash:
             return 0
 
         return data
@@ -210,7 +208,7 @@ class Client:
         time = str(hex(time)).lstrip('0x')
         time = time.rjust(6, '0')
 
-        return (special + time + iteration + msg)
+        return (msg + special + time + iteration + self.hasher.currentHash)
 
     def close(self):
         self.s.close()
@@ -256,17 +254,13 @@ class Server:
         data = msgDecrypter(data, hash)
         print(data)
 
-        if data[:64] != hash:
+        if data[192:256] != hash:
             self.close()
             return 0
 
         hash = self.hasher.updateHash(1)
 
         msg = self.msgConstructor(msg, special)
-
-        print(msg)
-
-        msg = hash + msg
         msg = msgEncrypter(msg, hash)
 
         self.conn.sendall(msg)
@@ -283,7 +277,7 @@ class Server:
         time = str(hex(time)).lstrip('0x')
         time = time.rjust(6, '0')
 
-        return (special + time + iteration + msg)
+        return (msg + special + time + iteration + self.hasher.currentHash)
 
     def close(self):
         self.s.close()

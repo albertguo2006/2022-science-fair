@@ -22,4 +22,4 @@ while True:
     if msg == 0:
         break
 
-    print(f"Message recived: {bytes.fromhex(msg[80:256]).decode('utf-8')}")
+    print(f"Message recived: {bytes.fromhex(msg[0:176]).decode('utf-8')}")
