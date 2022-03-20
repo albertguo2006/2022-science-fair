@@ -13,6 +13,7 @@ END_SP = "01"
 RESENT_SP = "02"
 
 PORT = 2000
+
 SERVER_IP = "127.0.0.1"
 # SERVER_IP = "192.168.1.64"
 
@@ -20,24 +21,23 @@ GRAY = (128, 128, 128)
 BLACK = (0, 0, 0)
 SCREEN_SIZE = (600, 600)
 
-TICK_TIME = 0
+TICK_TIME = 20
 
 KEY = input("Input a key: ")
 KEY = hashlib.sha256(KEY.encode("utf-8"))
 KEY = KEY.hexdigest()
-
-client = Client(KEY, PORT, SERVER_IP)
 
 pygame.init()
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(SCREEN_SIZE)
 screen.fill(BLACK)
 
+client = Client(KEY, PORT, SERVER_IP)
+
 ROLLING_TIMER_LENGTH = 256
 TIMELIST = [0.01] * ROLLING_TIMER_LENGTH
 
 counter = 0
-
 running = True
 
 while running:

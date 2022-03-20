@@ -4,6 +4,7 @@ from helper import *
 
 print("Hi! This program is designed as a interative demo to help you understand the methodology of this project.")
 print("Just follow allong with the steps and press enter to continue.")
+print("NOTE: This demo is depreciated and no longer accuratly represents the current iteration of the system. It, however, will be kept for demo purposes.")
 
 SEED = input("Input a seed for the encyption keys: ")
 

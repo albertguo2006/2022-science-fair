@@ -170,11 +170,30 @@ class Client:
 
         self.s.sendall(keyHash)
 
+        # Timer
+        start = t.time()
+
         # Recive a peice of data containing a unique 512 bit key
         proofhash = self.s.recv(512)
+
+        end = t.time()
+        timeDiff = end - start
+
+        if timeDiff - 0.05 > 0.01:
+            print(f"Server took too long to respond! {timeDiff}s")
+
+            self.close()
+            return 0
+
         proofhash = msgDecrypter(proofhash, self.key)
 
-        self.hasher = Hasher(proofhash[:64], proofhash[64:128])
+        if proofhash[64:128] != self.key:
+            print(f"Server sent wrong key!")
+
+            self.close()
+            return 0
+
+        self.hasher = Hasher(self.key, proofhash[:64])
 
     def send(self, msg, special):
         hash = self.hasher.updateHash(1)
@@ -224,19 +243,25 @@ class Server:
         self.s.listen()
 
         self.conn, self.addr = self.s.accept()
+        data = self.conn.recv(512)
 
-        data = self.conn.recv(1024)
+        start = t.time()
 
         keyHash = hashlib.sha512(bytes.fromhex(self.key))
         keyHash = keyHash.digest()
 
         if data == keyHash:
-            proofhash = secrets.token_hex(64)
-            msg = msgEncrypter(proofhash, self.key)
+            proofhash = secrets.token_hex(32)
+            msg = proofhash + self.key
+            msg = msgEncrypter(msg, self.key)
+
+            end = t.time()
+
+            t.sleep(0.05 - (start - end))
 
             self.conn.sendall(msg)
 
-            self.hasher = Hasher(proofhash[:64], proofhash[64:128])
+            self.hasher = Hasher(self.key, proofhash[:64])
 
         else:
             print("Key hash not expected value")
