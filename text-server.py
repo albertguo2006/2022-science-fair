@@ -8,7 +8,7 @@ START_SP = "01"
 END_SP = "01"
 RESENT_SP = "02"
 
-PORT = 2000
+PORT = 25564
 
 KEY = input("Input a key: ")
 KEY = hashlib.sha256(KEY.encode("utf-8"))
