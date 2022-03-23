@@ -179,7 +179,7 @@ class Client:
         end = t.time()
         timeDiff = end - start
 
-        if timeDiff - 0.05 > 0.01:
+        if timeDiff - 0.05 > 0.2:
             print(f"Server took too long to respond! {timeDiff}s")
 
             self.close()
