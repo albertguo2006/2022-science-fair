@@ -205,7 +205,8 @@ class Client:
 
         hash = self.hasher.updateHash(1)
 
-        data = self.s.recv(512)
+        data = self.s.recv(1024)
+
         if not data:
             return 0
 
